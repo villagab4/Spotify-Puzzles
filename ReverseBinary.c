@@ -5,7 +5,7 @@
 /** This is a solution to the Spotify Reversed Binary Numbers puzzle.
  *  @author Gabe Villasana
  *  @email: villagab4@gmail.com
- *	@date:	May 25, 2017 
+ *  @date:  May 25, 2017 
  */
 
 int reverseBinary(int input) {
