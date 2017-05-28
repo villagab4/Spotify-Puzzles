@@ -1,0 +1,3 @@
+May 28, 2017 Update
+
+It is clear that solving this problem by finding the largest clique in the graph is NP complete and would take too long to discover. My next solution will be to try and create a bipartitie graph seeing as those graphs tend to have properties allowing for time-inexpensive operations. My first thought is to create a simple unweighted/undirected graph where voters DO CONFLICT. This is the opposite of my current implementation which connects voters with non-conflicting votes. Then, I could applly some algorithms with bipartite graphs to reveal information about the complement of this graph. 
