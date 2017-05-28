@@ -84,59 +84,34 @@ void BornKerbosch(std::list<Node*> R, std::list<Node*> P, std::list<Node*> X) {
 	if ( (P.empty()) && (X.empty()) ) {
 
 		if (R.size() > maximalCliqueSize) maximalCliqueSize = R.size();
-		return;
-
+		
 	} else {
+
+		std::map<Node*, int> intersectFind;
 
 		// Determine pivot as elemnet in P U X with
 		// most neighbors.
-		std::list<Node*> mUnion (P);
 
-		for (auto iter = X.begin(); iter != X.end(); iter++) {
-			if (std::find(P.begin(), P.end(), *iter) == P.end()) mUnion.push_back(*iter);
+		// std::list<Node*> mUnion (P);
+
+		// Add each P entry to a map
+		for (auto uIter = P.begin(); uIter != P.end(); uIter++) {
+			intersectFind[*uIter]++;
 		}
 
 		Node *pivot;
 		if (!P.empty()) pivot = P.front();
-		else 			   pivot = X.front();
-
-		//unsigned int tempNeighbors = 0;
-		//unsigned int currPiv = 0;
-
-		for (auto iter2 = mUnion.begin(); iter2 != mUnion.end(); iter2++) {
-			/**
-			// Iterate through each elements set of edges
-			for (auto itera = (*iter2)->edges.begin(); itera != (*iter2)->edges.end(); itera++) {
-
-				// Node has neighbor in P
-				if (std::find(P.begin(), P.end(), *itera) != P.end()) {
-
-					// currPiv is total number of neighbors within P
-					currPiv++;
-
-					// Get pivot with most neighbors in P
-					if (currPiv > tempNeighbors) {
-
-						// Adjust comparison variable
-						tempNeighbors = currPiv;
-
-						// Set pivot variable
-						pivot = *iter2;
-
-					}
-
-				}
-
-			}
-			*/
-
-		}
+		else 			pivot = X.front();
 
 		// Create list of P \ N(pivot)
 		std::list<Node*> Pprime (P);
 
+		// Since intersectFind map was not cleared, still has 
+		// entries from P. Can just iterate through to find overlap
 		for (auto iter3 = pivot->edges.begin(); iter3 != pivot->edges.end(); iter3++) {
-			if (std::find(Pprime.begin(), Pprime.end(), *iter3) != Pprime.end()) Pprime.remove(*iter3);
+
+			if (intersectFind[*iter3] != 0) Pprime.remove(*iter3);
+
 		}
 
 		for (auto iter4 = Pprime.begin(); iter4 != Pprime.end(); /* Intentionally blank. */) {
@@ -149,14 +124,21 @@ void BornKerbosch(std::list<Node*> R, std::list<Node*> P, std::list<Node*> X) {
 			// Union R and iter4
 			if (std::find(R.begin(), R.end(), temp) == R.end()) Rprime.push_back(temp);
 
-			// Intersect P and N(*iter4)
-			for (auto itP = P.begin(); itP != P.end(); itP++) {
-				if ( std::find(temp->edges.begin(), temp->edges.end(), *itP) != temp->edges.end() ) Pdoubleprime.push_back(*itP);
+			// Intersect P and N(*iter4). Since intersectFind
+			// still contains P elements, only need 1 iteration
+			for (auto edgeIt = temp->edges.begin(); edgeIt != temp->edges.end(); edgeIt++) {
+				if (intersectFind[*edgeIt] > 0) Pdoubleprime.push_back(*edgeIt);
 			}
+
+			// Reset map since done using P entries
+			intersectFind.clear();
 
 			// Intersect X and N(*iter4)
 			for (auto itX = X.begin(); itX != X.end(); itX++) {
-				if ( std::find(temp->edges.begin(), temp->edges.end(), *itX) != temp->edges.end() ) Xprime.push_back(*itX);
+				intersectFind[*itX]++;
+			}
+			for (auto edgeIt2 = temp->edges.begin(); edgeIt2 != temp->edges.end(); edgeIt2++) {
+				if (intersectFind[*edgeIt2] > 0) Xprime.push_back(*edgeIt2);
 			}
 			
 			BornKerbosch(Rprime, Pdoubleprime, Xprime);
@@ -166,6 +148,10 @@ void BornKerbosch(std::list<Node*> R, std::list<Node*> P, std::list<Node*> X) {
 
 			// Union X and iter4
 			if (std::find(X.begin(), X.end(), temp) == X.end()) X.push_back(temp);
+
+			// Clear for next iteration
+			intersectFind.clear();
+
 		}
 	}
 }
