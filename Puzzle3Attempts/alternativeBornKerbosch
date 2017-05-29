@@ -1,0 +1,75 @@
+void BornKerbosch(std::list<Node*> R, std::list<Node*> P, std::list<Node*> X) {
+
+	if ( (P.size() == 0) && (X.size() == 0) ) {
+
+		if (R.size() > maximalCliqueSize) maximalCliqueSize = R.size();
+
+	} else {
+
+		// Determine pivot as elemnet in P U X with
+		// most neighbors.
+		std::list<Node*> mUnion (P);
+
+		for (auto iter = X.begin(); iter != X.end(); iter++) {
+			if (std::fine(P.begin(), P.end(), *iter) == P.end()) mUnion.push_back(*iter);
+		}
+
+		Node* pivot;
+		int tempNeighbors = 0;
+		
+		for (auto iter2 = mUnion.begin(); iter2 != mUnion.end(); iter2++) {
+			if (*iter2->edges.size() > tempNeighbors) pivot = *iter2;
+		}
+
+		// For-each loop through P
+		for (auto it = P.begin(); it != P.end(); /* Empty on purpose. */) {
+
+			// Check that n is not a neighbor of pivot
+			if ( std::find(pivot->edges.begin(), pivot->edges.end(), *it) == pivot->edges.end() ) {
+
+				// Remove *it from set P. Note: need to 
+				// dereference it since it is a pointer to 
+				// my Node*. Issue is that I am removing the 
+				// element but then trying to add it.
+				Node *temp = *it;
+				P.remove(*it++);
+
+				// Instantiate new R list
+				std::list<Node*> Rprime;
+
+				// Add *it to set R if not already in R
+				if ( std::find(R.begin(), R.end(), temp) == R.end() ) Rprime.push_back(temp);
+
+				// Set newP to intersection of P and neighbors of n. To find 
+				// intersection quickly, build map.
+				// P = intersection(P, n->edges) 
+				std::list<Node*> Pprime;
+				for (auto itP = P.begin(); itP != P.end(); itP++) {
+					if ( std::find(temp->edges.begin(), temp->edges.end(), *itP) != temp->edges.end() ) Pprime.push_back(*itP);
+				}
+
+				/**
+				// Set X to intersection of X and neighbors of n. Similarly,
+				// use a map to find intersection quickly
+				// X = intersection(X, n->edges);
+				std::list<Node*> Xprime;
+				for (auto itX = X.begin(); itX != X.end(); itX++) {
+					if ( std::find(temp->edges.begin(), temp->edges.end(), *itX) != temp->edges.end() ) Pprime.push_back(*itX);
+				}
+				*/
+				std::list<Node*> Xprime (X);
+				Xprime.remove(temp);
+				//if ( std::fine(Xprime.begin(), Xprime.end(), temp) != Xprime.end() ) 
+
+				// Recursively call BornKerbosch algorithm on modified sets
+				BornKerbosch(Rprime, Pprime, Xprime);
+
+				// Set X to union of X and n
+				if ( std::find(X.begin(), X.end(), temp) == X.end() ) X.push_back(temp);
+
+			}
+
+		}
+
+	}
+}
