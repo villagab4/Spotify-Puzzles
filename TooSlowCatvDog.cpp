@@ -56,21 +56,6 @@ void buildGraph(int numVoters, Graph &voters) {
 	}
 
 }
-/**
-std::list<Node*> intersection(std::list<Node*> A, std::list<Node*> B) {
-	std::list<Node*> intersect;
-	std::map<Node*, int> hash;
-	for (Node* a: A) {
-		hash[a]++;
-	}
-	for (Node* b: B) {
-		if (hash.find(b) != hash.end()) intersect.push_back(b);
-	}
-	return intersect;
-}
-
-*/
-
 
 /** This method returns the maximum number of satisfied customers.
  *  Using the Bron-Kerbosch algorithm, the program discovers the size 
